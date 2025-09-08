@@ -1,0 +1,13 @@
+services:
+  worker:
+    image: zotero-pdf-worker:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: dev.env
+    volumes:
+      - ./src:/app/src
+      - ./fonts:/app/fonts
+      - ./output:/app/output
+    tty: true
+    stdin_open: true

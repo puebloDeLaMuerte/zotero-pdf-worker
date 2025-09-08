@@ -1,0 +1,178 @@
+{
+  "zotero": {
+    "type": "group",
+    "group_id": "6087752",
+    "collection_key": "YOUR_COLLECTION_KEY",
+    "api_key_env": "ZOTERO_API_KEY"
+  },
+  "general": {
+    "item_types": "all",
+    "include_creator_types": ["author"],
+    "citation_style": "chicago-author-date",
+    "locale": "de-DE",
+    "layout_file": "layout.css",
+
+    "keep_file_history": true,
+    "filename_template": "{author_slug}.pdf",
+    "history_filename_template": "{author_slug}-{yyyy}{mm}{dd}-{HH}{MM}{SS}.pdf",
+
+    "wp_uploads_path_env": "WP_UPLOADS_PATH",
+    "site_id_env": "SITE_ID",
+    "bib_root_env": "BIB_ROOT",
+    "permalink_dir_env": "PERMALINK_DIR",
+    "history_dir_env": "HISTORY_DIR",
+
+    "log_file": "./generate.log"
+  },
+  "authors": [
+  {
+    "slug": "alina-bronsky",
+    "identifiers": ["Alina Bronsky", "Bronsky"]
+  },
+  {
+    "slug": "anke-stelling",
+    "identifiers": ["Anke Stelling", "Stelling"]
+  },
+  {
+    "slug": "anna-mayr",
+    "identifiers": ["Anna Mayr", "Mayr"]
+  },
+  {
+    "slug": "bov-bjerg",
+    "identifiers": ["Bov Bjerg", "Bjerg"]
+  },
+  {
+    "slug": "christian-baron",
+    "identifiers": ["Christian Baron", "Baron"]
+  },
+  {
+    "slug": "daniela-droscher",
+    "identifiers": ["Daniela Dröscher", "Dröscher"]
+  },
+  {
+    "slug": "deniz-ohde",
+    "identifiers": ["Deniz Ohde", "Ohde"]
+  },
+  {
+    "slug": "deniz-utlu",
+    "identifiers": ["Deniz Utlu", "Utlu"]
+  },
+  {
+    "slug": "dincer-gucyeter",
+    "identifiers": ["Dinçer Güçyeter", "Güçyeter"]
+  },
+  {
+    "slug": "emine-sevgi-ozdamar",
+    "identifiers": ["Emine Sevgi Özdamar", "Özdamar"]
+  },
+  {
+    "slug": "fatma-aydemir",
+    "identifiers": ["Fatma Aydemir", "Aydemir"]
+  },
+  {
+    "slug": "feridun-zaimoglu",
+    "identifiers": ["Feridun Zaimoğlu", "Zaimoglu", "Zaimoğlu"]
+  },
+  {
+    "slug": "fikri-anil-altintas",
+    "identifiers": ["Fikri Anil Altıntaş", "Altintas", "Altıntaş"]
+  },
+  {
+    "slug": "gun-tank",
+    "identifiers": ["Gün Tank", "Gün", "Tank", "Gun"]
+  },
+  {
+    "slug": "iris-wolff",
+    "identifiers": ["Iris Wolff", "Wolff"]
+  },
+  {
+    "slug": "katja-petrowskaja",
+    "identifiers": ["Katja Petrowskaja", "Petrowskaja"]
+  },
+  {
+    "slug": "kim-de-lhorizon",
+    "identifiers": ["Kim de l’Horizon", "de l’Horizon", "Horizon"]
+  },
+  {
+    "slug": "lena-gorelik",
+    "identifiers": ["Lena Gorelik", "Gorelik"]
+  },
+  {
+    "slug": "lena-schaette",
+    "identifiers": ["Lena Schätte", "Schätte"]
+  },
+  {
+    "slug": "lukas-barfuss",
+    "identifiers": ["Lukas Bärfuss", "Bärfuss", "Barfuss"]
+  },
+  {
+    "slug": "luna-al-mousli",
+    "identifiers": ["Luna Al-Mousli", "Al-Mousli", "Al Mousli"]
+  },
+  {
+    "slug": "marica-bodrozic",
+    "identifiers": ["Marica Bodrožić", "Bodrožić", "Bodrozic"]
+  },
+  {
+    "slug": "marko-dinic",
+    "identifiers": ["Marko Dinić", "Dinić", "Dinic"]
+  },
+  {
+    "slug": "marlen-hobrack",
+    "identifiers": ["Marlen Hobrack", "Hobrack"]
+  },
+  {
+    "slug": "martin-kordic",
+    "identifiers": ["Martin Kordić", "Kordić", "Kordic"]
+  },
+  {
+    "slug": "max-czollek",
+    "identifiers": ["Max Czollek", "Czollek"]
+  },
+  {
+    "slug": "mithu-sanyal",
+    "identifiers": ["Mithu Sanyal", "Sanyal"]
+  },
+  {
+    "slug": "necati-oziri",
+    "identifiers": ["Necati Öziri", "Öziri", "Oziri"]
+  },
+  {
+    "slug": "nino-haratischwili",
+    "identifiers": ["Nino Haratischwili", "Haratischwili"]
+  },
+  {
+    "slug": "olivia-wenzel",
+    "identifiers": ["Olivia Wenzel", "Wenzel"]
+  },
+  {
+    "slug": "paul-brodowsky",
+    "identifiers": ["Paul Brodowsky", "Brodowsky"]
+  },
+  {
+    "slug": "ralph-tharayil",
+    "identifiers": ["Ralph Tharayil", "Tharayil"]
+  },
+  {
+    "slug": "ronya-othmann",
+    "identifiers": ["Ronya Othmann", "Othmann"]
+  },
+  {
+    "slug": "sabrina-janesch",
+    "identifiers": ["Sabrina Janesch", "Janesch"]
+  },
+  {
+    "slug": "sasa-stanisic",
+    "identifiers": ["Saša Stanišić", "Stanišić", "Stanisic"]
+  },
+  {
+    "slug": "sasha-marianna-salzmann",
+    "identifiers": ["Sasha Marianna Salzmann", "Salzmann"]
+  },
+  {
+    "slug": "sharon-dodua-otoo",
+    "identifiers": ["Sharon Dodua Otoo", "Otoo"]
+  }
+]
+
+}

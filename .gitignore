@@ -1,0 +1,24 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+
+# --- Docker ---
+*.log
+*.pid
+*.tar
+*.gz
+.dockerignore
+
+# --- Local dev ---
+.env
+.env.*
+output/
+generate.log
+
+# --- Fonts ---
+fonts/
+
