@@ -215,19 +215,31 @@ def main():
         
         # Step 7: Save HTML to file for testing
         logger.info("Saving HTML to file...")
-        output_file = Path(config['env']['wp_uploads_path']) / "test_bibliography.html"
-        output_file.parent.mkdir(parents=True, exist_ok=True)
+        html_file = Path(config['env']['wp_uploads_path']) / "test_bibliography.html"
+        html_file.parent.mkdir(parents=True, exist_ok=True)
         
-        logger.debug(f"Output file path: {output_file}")
-        logger.debug(f"Output directory exists: {output_file.parent.exists()}")
+        logger.debug(f"HTML file path: {html_file}")
+        logger.debug(f"HTML file directory exists: {html_file.parent.exists()}")
         
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(html_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
-        logger.info(f"HTML saved successfully to: {output_file}")
-        logger.info(f"File size: {len(html_content)} characters")
+        logger.info(f"HTML saved successfully to: {html_file}")
+        logger.info(f"HTML file size: {len(html_content)} characters")
         
-        # TODO: Step 8: Convert HTML to PDF using WeasyPrint
+        # Step 8: Create PDF from HTML
+        logger.info("Creating PDF from HTML...")
+        from pdf_creator import PDFCreator
+        
+        pdf_creator = PDFCreator(config)
+        pdf_file = Path(config['env']['wp_uploads_path']) / "test_bibliography.pdf"
+        
+        success = pdf_creator.create_pdf_from_html(html_content, pdf_file)
+        
+        if success:
+            logger.info(f"PDF created successfully: {pdf_file}")
+        else:
+            logger.error("Failed to create PDF")
         
         logger.info("Zotero PDF Worker completed successfully")
         

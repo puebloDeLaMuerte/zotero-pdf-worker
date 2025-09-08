@@ -132,7 +132,7 @@ class HTMLPreprocessor:
     
     def _prepare_items_for_html(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Prepare items for HTML rendering by adding citations and sorting.
+        Prepare items for HTML rendering by adding citation data.
         
         Args:
             items: List of Zotero items
@@ -153,38 +153,17 @@ class HTMLPreprocessor:
             
             self.logger.debug(f"Processing item {i+1}/{len(items)}: {title}")
             
-            # Get formatted citation (now working!)
+            # Get formatted citation from Zotero API
             citation = self._get_item_citation(item)
             
-            # Prepare item data for template
             prepared_item = {
-                'key': item.get('key'),
                 'title': title,
-                'item_type': item_data.get('itemType', 'unknown'),
                 'citation': citation,
-                'creators': item_data.get('creators', []),
-                'date': item_data.get('date', ''),
-                'publisher': item_data.get('publisher', ''),
-                'publication_title': item_data.get('publicationTitle', ''),
-                'volume': item_data.get('volume', ''),
-                'issue': item_data.get('issue', ''),
-                'pages': item_data.get('pages', ''),
-                'url': item_data.get('url', ''),
-                'doi': item_data.get('DOI', ''),
-                'abstract': item_data.get('abstractNote', ''),
-                'tags': item_data.get('tags', []),
-                'sort_order': i + 1
+                'key': item.get('key', 'unknown'),
+                'data': item_data
             }
             
             prepared_items.append(prepared_item)
-            
-            # Log progress every 10 items
-            if (i + 1) % 10 == 0:
-                self.logger.info(f"Processed {i+1}/{len(items)} items...")
-        
-        # Sort items alphabetically
-        self.logger.debug("Sorting prepared items...")
-        prepared_items = self._sort_items(prepared_items)
         
         self.logger.info(f"Prepared {len(prepared_items)} items for HTML rendering")
         return prepared_items
@@ -203,59 +182,10 @@ class HTMLPreprocessor:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
-    <style>
-        body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-size: 12pt;
-            line-height: 1.6;
-            margin: 2cm;
-            color: #333;
-        }
-        
-        h1 {
-            font-size: 18pt;
-            font-weight: bold;
-            margin-bottom: 0.5cm;
-            text-align: center;
-            border-bottom: 2px solid #333;
-            padding-bottom: 0.5cm;
-        }
-        
-        h2 {
-            font-size: 14pt;
-            font-weight: normal;
-            margin-top: 0.5cm;
-            margin-bottom: 1cm;
-            text-align: center;
-            color: #666;
-        }
-        
-        .bibliography-item {
-            margin-bottom: 0.8cm;
-            text-align: justify;
-        }
-        
-        .citation {
-            text-align: justify;
-        }
-        
-        .footer {
-            margin-top: 2cm;
-            font-size: 10pt;
-            color: #666;
-            text-align: center;
-            border-top: 1px solid #ccc;
-            padding-top: 0.5cm;
-        }
-        
-        @page {
-            size: A4;
-            margin: 2cm;
-        }
-    </style>
+    <link rel="stylesheet" href="layout.css">
 </head>
 <body>
-    <h1>Netzwerk Herkünfte</h1>
+    <h1>NETZWERK<br>HERKÜNFTE</h1>
     
     <h2>{{ subtitle }}</h2>
     
