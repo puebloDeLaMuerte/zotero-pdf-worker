@@ -22,3 +22,6 @@ generate.log
 # --- Fonts ---
 fonts/
 
+# --- Secrets ---
+
+config.json

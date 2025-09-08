@@ -2,7 +2,7 @@
   "zotero": {
     "type": "group",
     "group_id": "6087752",
-    "collection_key": "YOUR_COLLECTION_KEY",
+    "collection_key": null,
     "api_key_env": "ZOTERO_API_KEY"
   },
   "general": {
