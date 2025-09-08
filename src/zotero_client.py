@@ -175,10 +175,14 @@ class ZoteroClient:
         
         try:
             data = self._make_request(url, params)
-            items = data.get('data', [])
             
-            if items and 'bib' in items[0]:
-                return items[0]['bib']
+            # The API returns the citation directly in the 'bib' key
+            if 'bib' in data:
+                citation = data['bib']
+                self.logger.debug(f"Got formatted citation for {item_key}")
+                return citation
+            else:
+                self.logger.debug(f"No 'bib' key in response for {item_key}")
             
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Failed to get citation for item {item_key}: {e}")

@@ -1,0 +1,373 @@
+"""
+HTML Preprocessor and Renderer
+
+This module handles converting Zotero data into HTML for PDF generation.
+It can work with both per-author lists and complete bibliographies.
+"""
+
+import logging
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from jinja2 import Environment, BaseLoader, Template
+from zotero_client import ZoteroClient
+
+
+class HTMLPreprocessor:
+    """Handles preprocessing Zotero data into HTML format."""
+    
+    def __init__(self, zotero_client: ZoteroClient, config: Dict[str, Any]):
+        """
+        Initialize the HTML preprocessor.
+        
+        Args:
+            zotero_client: ZoteroClient instance for fetching citations
+            config: Configuration dictionary
+        """
+        self.zotero_client = zotero_client
+        self.config = config
+        self.logger = logging.getLogger(__name__)
+        
+        # Set up Jinja2 environment
+        self.jinja_env = Environment(loader=BaseLoader())
+    
+    def _get_item_citation(self, item: Dict[str, Any]) -> str:
+        """
+        Get formatted citation for an item.
+        
+        Args:
+            item: Zotero item
+            
+        Returns:
+            Formatted citation string
+        """
+        item_key = item.get('key')
+        if not item_key:
+            self.logger.debug("No item key found, using fallback citation")
+            return "No citation available"
+        
+        # Try to get formatted citation from Zotero API
+        self.logger.info(f"Fetching citation for item {item_key}...")
+        citation = self.zotero_client.get_item_citation(item_key)
+        
+        if citation:
+            self.logger.info(f"✓ Got formatted citation for {item_key}: {citation[:50]}...")
+            return citation
+        else:
+            self.logger.info(f"✗ No formatted citation for {item_key}, using fallback")
+            fallback = self._create_fallback_citation(item)
+            self.logger.info(f"Fallback citation: {fallback}")
+            return fallback
+    
+    def _create_fallback_citation(self, item: Dict[str, Any]) -> str:
+        """
+        Create a basic citation when formatted citation is not available.
+        
+        Args:
+            item: Zotero item
+            
+        Returns:
+            Basic citation string
+        """
+        if 'data' not in item:
+            self.logger.debug("No item data found for fallback citation")
+            return "No citation available"
+        
+        item_data = item['data']
+        title = item_data.get('title', 'No title')
+        creators = item_data.get('creators', [])
+        
+        self.logger.debug(f"Creating fallback citation for: {title}")
+        
+        # Get first author
+        author_names = []
+        for creator in creators:
+            if creator.get('creatorType') == 'author':
+                first_name = creator.get('firstName', '')
+                last_name = creator.get('lastName', '')
+                if last_name:
+                    author_names.append(f"{last_name}, {first_name}".strip(', '))
+        
+        if author_names:
+            authors = ', '.join(author_names[:3])  # Limit to first 3 authors
+            if len(author_names) > 3:
+                authors += " et al."
+            self.logger.debug(f"Found authors: {authors}")
+        else:
+            authors = "Unknown author"
+            self.logger.debug("No authors found, using 'Unknown author'")
+        
+        fallback_citation = f"{authors}. {title}."
+        self.logger.debug(f"Created fallback citation: {fallback_citation}")
+        return fallback_citation
+    
+    def _sort_items(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Sort items alphabetically by title.
+        
+        Args:
+            items: List of Zotero items
+            
+        Returns:
+            Sorted list of items
+        """
+        self.logger.debug(f"Sorting {len(items)} items alphabetically by title")
+        
+        def get_sort_key(item):
+            if 'data' not in item:
+                return "zzz_no_title"
+            return item['data'].get('title', 'zzz_no_title').lower()
+        
+        sorted_items = sorted(items, key=get_sort_key)
+        
+        # Log first few titles for debugging
+        for i, item in enumerate(sorted_items[:5]):
+            if 'data' in item:
+                title = item['data'].get('title', 'No title')
+                self.logger.debug(f"Sorted item {i+1}: {title}")
+        
+        if len(sorted_items) > 5:
+            self.logger.debug(f"... and {len(sorted_items) - 5} more items")
+        
+        return sorted_items
+    
+    def _prepare_items_for_html(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Prepare items for HTML rendering by adding citations and sorting.
+        
+        Args:
+            items: List of Zotero items
+            
+        Returns:
+            List of items with added citation data
+        """
+        self.logger.info(f"Preparing {len(items)} items for HTML rendering...")
+        
+        prepared_items = []
+        for i, item in enumerate(items):
+            if 'data' not in item:
+                self.logger.debug(f"Skipping item {i+1}: no data found")
+                continue
+            
+            item_data = item['data']
+            title = item_data.get('title', 'No title')
+            
+            self.logger.debug(f"Processing item {i+1}/{len(items)}: {title}")
+            
+            # Get formatted citation (now working!)
+            citation = self._get_item_citation(item)
+            
+            # Prepare item data for template
+            prepared_item = {
+                'key': item.get('key'),
+                'title': title,
+                'item_type': item_data.get('itemType', 'unknown'),
+                'citation': citation,
+                'creators': item_data.get('creators', []),
+                'date': item_data.get('date', ''),
+                'publisher': item_data.get('publisher', ''),
+                'publication_title': item_data.get('publicationTitle', ''),
+                'volume': item_data.get('volume', ''),
+                'issue': item_data.get('issue', ''),
+                'pages': item_data.get('pages', ''),
+                'url': item_data.get('url', ''),
+                'doi': item_data.get('DOI', ''),
+                'abstract': item_data.get('abstractNote', ''),
+                'tags': item_data.get('tags', []),
+                'sort_order': i + 1
+            }
+            
+            prepared_items.append(prepared_item)
+            
+            # Log progress every 10 items
+            if (i + 1) % 10 == 0:
+                self.logger.info(f"Processed {i+1}/{len(items)} items...")
+        
+        # Sort items alphabetically
+        self.logger.debug("Sorting prepared items...")
+        prepared_items = self._sort_items(prepared_items)
+        
+        self.logger.info(f"Prepared {len(prepared_items)} items for HTML rendering")
+        return prepared_items
+    
+    def create_html_template(self) -> str:
+        """
+        Create the HTML template for bibliography rendering.
+        
+        Returns:
+            HTML template string
+        """
+        template_str = """
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            margin: 2cm;
+            color: #333;
+        }
+        
+        h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 1cm;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5cm;
+        }
+        
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 1cm;
+            margin-bottom: 0.5cm;
+        }
+        
+        .bibliography-item {
+            margin-bottom: 0.8cm;
+            text-indent: -1cm;
+            padding-left: 1cm;
+        }
+        
+        .item-number {
+            font-weight: bold;
+            margin-right: 0.5cm;
+        }
+        
+        .citation {
+            text-align: justify;
+        }
+        
+        .metadata {
+            font-size: 10pt;
+            color: #666;
+            margin-top: 0.3cm;
+        }
+        
+        .item-type {
+            font-style: italic;
+            color: #888;
+        }
+        
+        .footer {
+            margin-top: 2cm;
+            font-size: 10pt;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            padding-top: 0.5cm;
+        }
+        
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    
+    {% if subtitle %}
+    <h2>{{ subtitle }}</h2>
+    {% endif %}
+    
+    <div class="bibliography">
+        {% for item in items %}
+        <div class="bibliography-item">
+            <span class="item-number">{{ loop.index }}.</span>
+            <span class="citation">{{ item.citation }}</span>
+            <div class="metadata">
+                <span class="item-type">{{ item.item_type }}</span>
+                {% if item.date %}
+                | {{ item.date }}
+                {% endif %}
+                {% if item.doi %}
+                | DOI: {{ item.doi }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="footer">
+        <p>Generated on {{ generated_at }} | {{ total_items }} items | {{ citation_style }} style</p>
+    </div>
+</body>
+</html>
+        """
+        return template_str
+    
+    def render_to_html(self, items: List[Dict[str, Any]], title: str, subtitle: Optional[str] = None) -> str:
+        """
+        Render items to HTML.
+        
+        Args:
+            items: List of Zotero items
+            title: Title for the bibliography
+            subtitle: Optional subtitle
+            
+        Returns:
+            HTML string
+        """
+        self.logger.info(f"Rendering {len(items)} items to HTML with title: {title}")
+        
+        # Prepare items for rendering
+        prepared_items = self._prepare_items_for_html(items)
+        
+        # Get template
+        template_str = self.create_html_template()
+        template = self.jinja_env.from_string(template_str)
+        
+        # Prepare template data
+        template_data = {
+            'title': title,
+            'subtitle': subtitle,
+            'items': prepared_items,
+            'total_items': len(prepared_items),
+            'locale': self.config['general']['locale'],
+            'citation_style': self.config['general']['citation_style'],
+            'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Render HTML
+        html = template.render(**template_data)
+        
+        self.logger.info(f"HTML rendering complete: {len(html)} characters")
+        return html
+    
+    def render_per_author_bibliography(self, author_slug: str, items: List[Dict[str, Any]]) -> str:
+        """
+        Render a per-author bibliography.
+        
+        Args:
+            author_slug: Author slug for the bibliography
+            items: List of items for this author
+            
+        Returns:
+            HTML string
+        """
+        # Convert slug to readable title
+        title = author_slug.replace('-', ' ').title()
+        subtitle = f"Bibliography of {title}"
+        
+        return self.render_to_html(items, title, subtitle)
+    
+    def render_complete_bibliography(self, items: List[Dict[str, Any]]) -> str:
+        """
+        Render a complete bibliography.
+        
+        Args:
+            items: List of all items
+            
+        Returns:
+            HTML string
+        """
+        title = "Complete Bibliography"
+        subtitle = f"All {len(items)} items from the collection"
+        
+        return self.render_to_html(items, title, subtitle) 
