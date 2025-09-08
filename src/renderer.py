@@ -215,7 +215,7 @@ class HTMLPreprocessor:
         h1 {
             font-size: 18pt;
             font-weight: bold;
-            margin-bottom: 1cm;
+            margin-bottom: 0.5cm;
             text-align: center;
             border-bottom: 2px solid #333;
             padding-bottom: 0.5cm;
@@ -223,35 +223,20 @@ class HTMLPreprocessor:
         
         h2 {
             font-size: 14pt;
-            font-weight: bold;
-            margin-top: 1cm;
-            margin-bottom: 0.5cm;
+            font-weight: normal;
+            margin-top: 0.5cm;
+            margin-bottom: 1cm;
+            text-align: center;
+            color: #666;
         }
         
         .bibliography-item {
             margin-bottom: 0.8cm;
-            text-indent: -1cm;
-            padding-left: 1cm;
-        }
-        
-        .item-number {
-            font-weight: bold;
-            margin-right: 0.5cm;
+            text-align: justify;
         }
         
         .citation {
             text-align: justify;
-        }
-        
-        .metadata {
-            font-size: 10pt;
-            color: #666;
-            margin-top: 0.3cm;
-        }
-        
-        .item-type {
-            font-style: italic;
-            color: #888;
         }
         
         .footer {
@@ -270,26 +255,14 @@ class HTMLPreprocessor:
     </style>
 </head>
 <body>
-    <h1>{{ title }}</h1>
+    <h1>Netzwerk Herkünfte</h1>
     
-    {% if subtitle %}
     <h2>{{ subtitle }}</h2>
-    {% endif %}
     
     <div class="bibliography">
         {% for item in items %}
         <div class="bibliography-item">
-            <span class="item-number">{{ loop.index }}.</span>
             <span class="citation">{{ item.citation }}</span>
-            <div class="metadata">
-                <span class="item-type">{{ item.item_type }}</span>
-                {% if item.date %}
-                | {{ item.date }}
-                {% endif %}
-                {% if item.doi %}
-                | DOI: {{ item.doi }}
-                {% endif %}
-            </div>
         </div>
         {% endfor %}
     </div>
@@ -367,7 +340,7 @@ class HTMLPreprocessor:
         Returns:
             HTML string
         """
-        title = "Complete Bibliography"
-        subtitle = f"All {len(items)} items from the collection"
+        title = "Netzwerk Herkünfte"
+        subtitle = f"Complete Bibliography - All {len(items)} items from the collection"
         
         return self.render_to_html(items, title, subtitle) 
